@@ -226,7 +226,7 @@ module Fugit
       ifrom = from.to_i
 
       i = 0
-      t = TimeCursor.new(self, from.translate(@timezone))
+      t = TimeCursor.new(self, from.translate(@timezone || from.zone))
         #
         # the translation occurs in the timezone of
         # this Fugit::Cron instance
