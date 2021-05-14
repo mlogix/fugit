@@ -1348,3 +1348,40 @@ describe Fugit::Cron do
   end
 end
 
+describe Fugit::Cron do
+  describe "non standard cases" do
+    describe ".parse" do
+      it "should parse incorrect expression" do
+        time = Time.parse("2021-05-14 17:06:00").utc
+        cron = Fugit::Cron.parse("7 0/1 * * *")
+        next_time = cron.next_time(time)
+
+        expect(next_time).to eq Time.parse("2021-05-14 17:07:00").utc
+      end
+
+      it do
+        time = Time.parse("2021-05-14 17:06:00")
+        cron = Fugit::Cron.parse("7 0-23/1 * * *")
+        next_time = cron.next_time(time)
+
+        expect(next_time).to eq Time.parse("2021-05-14 17:07:00")
+      end
+
+      it do
+        time = Time.parse("2021-05-14 17:06:00")
+        cron = Fugit::Cron.parse("7 */1 * * *")
+        next_time = cron.next_time(time)
+
+        expect(next_time).to eq Time.parse("2021-05-14 17:07:00")
+      end
+
+      it do
+        time = Time.parse("2021-05-14 17:06:00")
+        cron = Fugit::Cron.parse("7 * * * *")
+        next_time = cron.next_time(time)
+
+        expect(next_time).to eq Time.parse("2021-05-14 17:07:00")
+      end
+    end
+  end
+end

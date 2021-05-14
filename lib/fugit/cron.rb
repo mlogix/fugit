@@ -30,14 +30,11 @@ module Fugit
       end
 
       def parse(s)
-
         return s if s.is_a?(self)
 
-        s = SPECIALS[s] || s
-
+        s = prepare_cron_string(s)
         return nil unless s.is_a?(String)
 
-#p s; Raabro.pp(Parser.parse(s, debug: 3), colors: true)
         h = Parser.parse(s)
 
         return nil unless h
@@ -49,6 +46,21 @@ module Fugit
 
         parse(s) ||
         fail(ArgumentError.new("invalid cron string #{s.inspect}"))
+      end
+
+      def prepare_cron_string(input)
+        input = SPECIALS[input] || input
+        h = [:minute, :hour, :mday, :month, :wday].zip(input.split(" ")).to_h
+
+        # Fix for non standard cases like:
+        #   0/1 => 0-23/1
+        #
+        if (/^\d{1,2}\/\d{1,2}/).match?(h[:hour])
+          hours = h[:hour].split("/")
+          h[:hour] = [hours.first, "-", "23", "/", hours.last].join
+        end
+
+        h.values.join(" ")
       end
     end
 
